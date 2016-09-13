@@ -28,7 +28,7 @@ func main() {
 			panic(err)
 		}
 
-		fmt.Println(fileCompetitions)
+		fmt.Printf("%#v\n", fileCompetitions)
 	}
 
 	// merge entries
