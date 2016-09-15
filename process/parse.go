@@ -13,7 +13,7 @@ import (
 	"github.com/yhat/scrape"
 )
 
-func parseFile(path string) (*[]model.Competition, error) {
+func parseFile(path string) (*[]*model.Competition, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -31,12 +31,12 @@ func parseFile(path string) (*[]model.Competition, error) {
 	}
 
 	dateNode, _ := scrape.Find(node, scrape.ByClass("selecteddate"))
-	date, _ := time.Parse("1 January 2006", scrape.Text(dateNode))
+	date, _ := time.Parse("2 January 2006", scrape.Text(dateNode))
 
 	// table > tbody > tr
 	currentRow := eventTable.FirstChild.FirstChild
 
-	var competitions []model.Competition
+	var competitions []*model.Competition
 	for currentRow != nil {
 		headerRow := currentRow
 		infoRow := currentRow.NextSibling
@@ -58,7 +58,7 @@ func parseFile(path string) (*[]model.Competition, error) {
 		web, _ := descMap["web"]
 		notes, _ := descMap["notes"]
 
-		competitions = append(competitions, model.Competition{
+		competitions = append(competitions, &model.Competition{
 			Name:     name,
 			Location: model.Location{Name: location},
 
