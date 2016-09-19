@@ -1,4 +1,4 @@
-package main
+package process
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 	"github.com/yhat/scrape"
 )
 
-func parseFile(path string) (*[]*model.Competition, error) {
+func ParseFile(path string) (*[]*model.Competition, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func parseFile(path string) (*[]*model.Competition, error) {
 
 		competitions = append(competitions, &model.Competition{
 			Name:     name,
-			Location: model.Location{Name: location},
+			Location: &model.Location{Name: location},
 
 			// start and end are equal in this step
 			StartDate: date,

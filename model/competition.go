@@ -5,7 +5,9 @@ import "time"
 type Competition struct {
 	Name string
 
-	Location Location
+	Location          *Location
+	DrivingDirections *Directions
+	PublicDirections  *Directions
 
 	StartDate time.Time
 	EndDate   time.Time

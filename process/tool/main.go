@@ -1,18 +1,29 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
 
+	"googlemaps.github.io/maps"
+
 	"github.com/will14smith/agb-calendar/format"
 	"github.com/will14smith/agb-calendar/model"
+	"github.com/will14smith/agb-calendar/process"
 )
 
 var dataBase = path.Join("..", "data")
 var dayPathRegex = regexp.MustCompile("[0-9]{4}-[0-9]{2}[\\\\/][0-9]{2}.html$")
+
+var londonArchersBaseLocation = model.Location{
+	Name: "Perk's Field, London",
+
+	Lat:  51.509048,
+	Long: -0.189520,
+}
 
 func main() {
 	files := getAllFiles()
@@ -20,13 +31,14 @@ func main() {
 
 	competitions := parseFiles(files)
 	log.Println("Parsed", len(competitions), "competitions")
-	writeToFile("competitions.ical", competitions)
 
 	competitions = mergeCompetitions(competitions)
 	log.Println("Merged into", len(competitions), "competitions")
-	writeToFile("merged.ical", competitions)
 
 	// resolve locations (as best as possible)
+	competitions, successfulCount := resolveLocations(competitions)
+	log.Println("Resolved locations for", successfulCount, "competitions")
+	writeToFile("output.json", competitions)
 }
 
 func getAllFiles() []string {
@@ -47,7 +59,7 @@ func parseFiles(files []string) []*model.Competition {
 		}
 
 		// parse each entry
-		fileCompetitions, err := parseFile(file)
+		fileCompetitions, err := process.ParseFile(file)
 		if err != nil {
 			panic(err)
 		}
@@ -85,6 +97,37 @@ func mergeCompetitions(competitions []*model.Competition) []*model.Competition {
 	}
 
 	return merged
+}
+
+func resolveLocations(competitions []*model.Competition) ([]*model.Competition, int) {
+	success := 0
+
+	api, err := process.NewPlaceApi()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, competition := range competitions {
+		newLocation, err := api.lookupPlace(competition.Location)
+		if err != nil {
+			fmt.Println("ERR: %#v", err)
+			continue
+		}
+		competition.Location = newLocation
+		success++
+
+		competition.DrivingDirections, err = api.directions(maps.TravelModeDriving, &londonArchersBaseLocation, newLocation)
+		if err != nil {
+			fmt.Println("ERR: %#v", err)
+		}
+
+		competition.PublicDirections, err = api.directions(maps.TravelModeTransit, &londonArchersBaseLocation, newLocation)
+		if err != nil {
+			fmt.Println("ERR: %#v", err)
+		}
+	}
+
+	return competitions, success
 }
 
 func findCandidate(lookup map[string]*model.Competition, competition *model.Competition) (key string, found bool) {
@@ -129,7 +172,7 @@ func writeToFile(fileName string, competitions []*model.Competition) {
 	if err != nil {
 		panic(err)
 	}
-	_, err = file.WriteString(format.ConvertToICal(competitions))
+	_, err = file.WriteString(format.ConvertToJson(competitions))
 	if err != nil {
 		panic(err)
 	}
