@@ -13,29 +13,39 @@ const pageTemplate = `
 	<head>
 		<meta charset="UTF-8">
 		<title>AGB Competitions</title>
+        <style>
+        /* I'm so sorry... */
+        * { box-sizing: border-box; font-family: sans-serif; }
+        dd { margin: 0; }
+        .title { width: 100px; font-weight: bold; }
+        .body { margin-bottom: 10px; }
+        .location, .when, .driving, .transit { float: left; margin-right: 50px; }
+        h1, .rounds.title, .driving.title { clear: both; }
+        ul { margin: 0; padding: 0; margin-left: 165px; }
+        </style>
 	</head>
 	<body>
 		{{range .}}
             <h1>{{ .Name }}</h1>
             <dl>
-                <dt>Location</dt><dd>{{ .Location.Name }}</dd>
-                <dt>Round</dt><dd><ul>
+                <dt class="location title">Location</dt><dd class="location data">{{ .Location.Name }}</dd>
+                <dt class="rounds title">Round</dt><dd class="rounds body"><ul>
                     {{range .Rounds}}
                         <li>{{ . }}</li>
                     {{else}}<li><strong>No rows</strong></li>{{end}}
                 </ul></dd>
                 {{if eq .StartDate.Unix .EndDate.Unix}}
-                <dt>When</dt><dd>{{template "date" .StartDate }}</dd>
+                <dt class="when title">When</dt><dd class="when body">{{template "date" .StartDate }}</dd>
                 {{else}}
-                <dt>When</dt><dd>{{template "date" .StartDate }} - {{template "date" .EndDate }}</dd>
+                <dt class="when title">When</dt><dd class="when body">{{template "date" .StartDate }} - {{template "date" .EndDate }}</dd>
                 {{end}}
                 {{if .DrivingDirections}}
-                    <dt>Driving Time</dt><dd>{{ .DrivingDirections.Duration }}</dd>
+                    <dt class="driving title">Driving Time</dt><dd class="driving body">{{ .DrivingDirections.Duration }}</dd>
                 {{end}}
                 {{if .PublicDirections}}
-                    <dt>Transit Time</dt><dd>{{ .PublicDirections.Duration }}</dd>
+                    <dt class="transit title">Transit Time</dt><dd class="transit body">{{ .PublicDirections.Duration }}</dd>
                 {{end}}
-            </dl>
+            </dl>@
         {{else}}<div><strong>No rows</strong></div>{{end}}
 	</body>
 </html>

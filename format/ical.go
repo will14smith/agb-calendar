@@ -40,6 +40,12 @@ func getICalDescription(competition *model.Competition) string {
 	var buf bytes.Buffer
 
 	fmt.Fprintf(&buf, "Location: %s\\n", competition.Location.Name)
+	if competition.DrivingDirections != nil {
+		fmt.Fprintf(&buf, "Driving (from central London): %.1fmi - %s\\n", float64(competition.DrivingDirections.Distance)/1609, competition.DrivingDirections.Duration.String())
+	}
+	if competition.PublicDirections != nil {
+		fmt.Fprintf(&buf, "Transit (from central London): %.1fmi - %s\\n", float64(competition.PublicDirections.Distance)/1609, competition.PublicDirections.Duration.String())
+	}
 	fmt.Fprintf(&buf, "Rounds: %s\\n", strings.Join(competition.Rounds, "; "))
 	fmt.Fprintf(&buf, "Organiser: %s\\n", competition.Organiser)
 	fmt.Fprintf(&buf, "Phone: %s\\n", competition.Phone)
