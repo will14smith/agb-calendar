@@ -15,7 +15,7 @@ import (
 	"github.com/will14smith/agb-calendar/process"
 )
 
-var dataBase = path.Join("..", "data")
+var dataBase = path.Join("..", "..", "data")
 var dayPathRegex = regexp.MustCompile("[0-9]{4}-[0-9]{2}[\\\\/][0-9]{2}.html$")
 
 var londonArchersBaseLocation = model.Location{
@@ -108,22 +108,22 @@ func resolveLocations(competitions []*model.Competition) ([]*model.Competition, 
 	}
 
 	for _, competition := range competitions {
-		newLocation, err := api.lookupPlace(competition.Location)
+		newLocation, err := api.Lookup(competition.Location)
 		if err != nil {
-			fmt.Println("ERR: %#v", err)
+			fmt.Println("ERR: ", err)
 			continue
 		}
 		competition.Location = newLocation
 		success++
 
-		competition.DrivingDirections, err = api.directions(maps.TravelModeDriving, &londonArchersBaseLocation, newLocation)
+		competition.DrivingDirections, err = api.Directions(maps.TravelModeDriving, &londonArchersBaseLocation, newLocation)
 		if err != nil {
-			fmt.Println("ERR: %#v", err)
+			fmt.Println("ERR: ", err)
 		}
 
-		competition.PublicDirections, err = api.directions(maps.TravelModeTransit, &londonArchersBaseLocation, newLocation)
+		competition.PublicDirections, err = api.Directions(maps.TravelModeTransit, &londonArchersBaseLocation, newLocation)
 		if err != nil {
-			fmt.Println("ERR: %#v", err)
+			fmt.Println("ERR: ", err)
 		}
 	}
 

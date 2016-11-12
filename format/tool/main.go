@@ -18,7 +18,7 @@ func main() {
 	}
 
 	competitions := format.ConvertFromJson(bytes.NewBuffer(buf).String())
-	sort.Sort(ByDate(competitions))
+	sort.Sort(ByDateThenName(competitions))
 
 	err = ioutil.WriteFile("output.ical", []byte(format.ConvertToICal(competitions)), 0)
 	if err != nil {
@@ -31,8 +31,18 @@ func main() {
 	}
 }
 
-type ByDate []*model.Competition
+type ByDateThenName []*model.Competition
 
-func (a ByDate) Len() int           { return len(a) }
-func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByDate) Less(i, j int) bool { return a[i].StartDate.Before(a[j].StartDate) }
+func (a ByDateThenName) Len() int      { return len(a) }
+func (a ByDateThenName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByDateThenName) Less(i, j int) bool {
+	if a[i].StartDate.Before(a[j].StartDate) {
+		return true
+	}
+
+	if !a[i].StartDate.Equal(a[j].StartDate) {
+		return false
+	}
+
+	return a[i].Name < a[j].Name
+}

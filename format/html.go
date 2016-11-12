@@ -45,7 +45,7 @@ const pageTemplate = `
                 {{if .PublicDirections}}
                     <dt class="transit title">Transit Time</dt><dd class="transit body">{{ .PublicDirections.Duration }}</dd>
                 {{end}}
-            </dl>@
+            </dl>
         {{else}}<div><strong>No rows</strong></div>{{end}}
 	</body>
 </html>

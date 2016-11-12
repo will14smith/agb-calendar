@@ -27,12 +27,12 @@ func NewPlaceApi() (*PlaceApi, error) {
 		return nil, err
 	}
 
-	return &placeApi{
+	return &PlaceApi{
 		client: c,
 	}, nil
 }
 
-func (api *placeApi) Lookup(seed *model.Location) (*model.Location, error) {
+func (api *PlaceApi) Lookup(seed *model.Location) (*model.Location, error) {
 	r := &maps.GeocodingRequest{
 		Address: seed.Name,
 		Region:  "uk",
@@ -57,7 +57,7 @@ func (api *placeApi) Lookup(seed *model.Location) (*model.Location, error) {
 	}, nil
 }
 
-func (api *placeApi) Directions(mode maps.Mode, from, to *model.Location) (*model.Directions, error) {
+func (api *PlaceApi) Directions(mode maps.Mode, from, to *model.Location) (*model.Directions, error) {
 	r := &maps.DirectionsRequest{
 		Origin:      toDirectionsLocation(from),
 		Destination: toDirectionsLocation(to),
